@@ -54,6 +54,7 @@ export default function AboutPage() {
         <p className="mb-4">This project was created by Pratham Rao. We are passionate about using data science to make a positive impact in our community.</p>
         <h1 className="text-3xl font-bold mb-4">Feedback and Contact</h1>
         <p className="mb-4">We welcome your feedback and suggestions. Please contact us at  with any questions or comments.</p>
+        <a className="text-red-400" href="mailto:prathamrao021@gmail.com">Click here to mail me.</a>
       </div>
     
     </>
