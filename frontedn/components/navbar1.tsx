@@ -36,6 +36,7 @@ export const Navbar1 = () => {
   ];
 
   return (
+    <>
     <Navbar onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
@@ -83,5 +84,8 @@ export const Navbar1 = () => {
         ))}
       </NavbarMenu>
     </Navbar>
+
+    
+    </>
   );
 };

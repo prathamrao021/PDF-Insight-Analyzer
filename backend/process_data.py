@@ -1,11 +1,17 @@
-import urllib.request
 from pypdf import PdfReader
 import pandas as pd
-import re
-import sqlite3
-import argparse
 import os
 import glob
+import requests
+import time
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.cluster import KMeans
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+
+API_KEY = "..."
 
 def fetchincidents(pdf):
     reader = PdfReader(pdf)
@@ -46,87 +52,80 @@ def extractincidents(data):
         file.write(temp_text)
     
     return rows
+
+def get_lat_lng(address):
+    time.sleep(0.1)
+    base_url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {"address": address, "key": API_KEY}
+    response = requests.get(base_url, params=params).json()
+    # print(response)
+    if response['status'] == "OK":
+        location = response['results'][0]['geometry']['location']
+
+        # print(location['lat'], location['lng'])
+
+        return location['lat'], location['lng']
+    else:
+        print('0, 0')
+        return 0, 0
+
+def convert_data_to_numeric(data):
+    data = pd.DataFrame(data, columns=["Date/Time", "IncidentNumber", "Location", "Nature", "IncidentOri"])
     
+    # try:
+    #     data['Latitude'], data['Longitude'] = zip(*data['Location'].apply(get_lat_lng))
+    # except:
+    #     data['Latitude'], data['Longitude'] = 0, 0
+
+    data['Hour'] = pd.to_datetime(data['Date/Time']).dt.hour
+    data['Day'] = pd.to_datetime(data['Date/Time']).dt.day
+    
+    # missing_locations = data[data[['Latitude', 'Longitude']].isna().any(axis=1)]
+
+    encoder = LabelEncoder()
+    data['NatureEncoded'] = encoder.fit_transform(data['Nature'])
+    data['Day'] = encoder.fit_transform(data['Day'])
+
+    data = data.drop(columns=['Date/Time', 'Location', 'Nature', 'IncidentNumber', 'IncidentOri'])
+
+    # print(data)
+
+    scaler = StandardScaler()
+    data = scaler.fit_transform(data)
+
+    return data
+
+def write_processded_data(data):
+    data.to_csv('resources/processed_data.csv', index=False)
+
+def pca_conversion(data):
+    pca = PCA(n_components=2)  # Reduce to 2 components for visualization
+    principal_components = pca.fit_transform(data.drop(columns=['Cluster']))
+    pca_data = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+    pca_data['Cluster'] = data['Cluster']
+    return pca_data
+
+
+#how the workflow will look like
 def main_workflow():
     pdf_files = glob.glob(os.path.join('uploads', '*.pdf'))
 
+    combined_data = pd.DataFrame()
+    # clusters = pd.DataFrame()
     for pdf_file in pdf_files:
         incidents = fetchincidents(pdf_file)
         separated_data = extractincidents(incidents)
+        encoded_data = convert_data_to_numeric(separated_data)
+        combined_data = pd.concat([combined_data, pd.DataFrame(encoded_data)], ignore_index=True)
+
+    kmeans = KMeans(n_clusters=5, random_state=42)
+    combined_data['Cluster'] = kmeans.fit_predict(combined_data)
 
     
+    write_processded_data(combined_data)
+
+    combined_linear_data = pca_conversion(combined_data)
+
 
 # if __name__ == "__main__":
 #     main_workflow()
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def createdb():
-#     if os.path.exists("resources/normanpd.db"):
-#         os.remove("resources/normanpd.db")
-#     conn = sqlite3.connect("resources/normanpd.db")
-    
-#     cursor = conn.cursor()
-    
-#     cursor.execute("CREATE TABLE IF NOT EXISTS incidents (incident_time TEXT, incident_number TEXT, incident_location TEXT, nature TEXT, incident_ori TEXT)")
-    
-#     conn.commit()
-#     conn.close()
-
-
-# def populatedb(separated_data):
-#     conn = sqlite3.connect("resources/normanpd.db")
-    
-#     cursor = conn.cursor()
-    
-#     cursor.executemany("INSERT INTO incidents VALUES(?, ?, ?, ?, ?)", separated_data)
-#     conn.commit()
-#     conn.close()
-
-# def status():
-#     conn = sqlite3.connect("resources/normanpd.db")
-    
-#     cursor = conn.cursor()
-    
-#     cursor.execute("SELECT nature, count(nature) FROM incidents GROUP BY nature ORDER BY nature ASC")
-#     printables = cursor.fetchall()
-#     data = ''
-#     with open("resources/status.txt", "w") as file:
-#         for i,v in enumerate(printables):
-#             if v[0] == "Nature":
-#                 continue
-#             if i != len(printables) - 1:
-#                 file.write(f"{v[0]}|{v[1]}\n")
-#                 data += f"{v[0]}|{v[1]}\n"
-#             else:
-#                 file.write(f"{v[0]}|{v[1]}")
-#                 data += f"{v[0]}|{v[1]}"
-#     conn.close()
-#     print(data)
-#     return data
-
-# if __name__ == "__main__":
-    
-    
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("--incidents", type=str, required=True, help="Incident summary url.")
-#     args = parser.parse_args()
-    
-#     filename = downloaddata(args.incidents)
-#     data = fetchincidents("resources/incident1.pdf")
-#     separated_data = extractincidents(data)
-#     createdb()
-#     populatedb(separated_data[1:])
-#     status()
-    
-    
