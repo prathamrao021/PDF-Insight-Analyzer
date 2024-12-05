@@ -72,7 +72,5 @@ This project is a web application that allows users to upload PDF files or provi
 
 ## to-do
 - [ ] readme
-- [ ] tests
 - [ ] video
-- [ ] setup.cfg, setup.py
 - [ ] COLLABORATORS

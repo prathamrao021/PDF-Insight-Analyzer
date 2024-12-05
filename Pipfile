@@ -10,6 +10,8 @@ fastapi = {extras = ["standard"], version = "*"}
 pypdf = "*"
 matplotlib = "*"
 seaborn = "*"
+pytest = "*"
+requests = "*"
 
 [dev-packages]
 

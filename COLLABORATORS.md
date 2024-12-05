@@ -1,0 +1,1 @@
+Stackoverflow | https://stackoverflow.com/questions/69795302/pipenv-is-not-recognized-as-an-internal-or-external-command-operable-program | helped me with virtual enviornment
