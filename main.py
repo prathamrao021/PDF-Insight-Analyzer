@@ -62,16 +62,16 @@ async def upload_file(files: list[UploadFile] = File(...)):
 @app.post("/upload_urls")
 async def upload_urls(urls: dict):
     print(urls)
+    upload_file = glob.glob(os.path.join(UPLOAD_FOLDER, '*'))
+    for f in upload_file:
+        os.remove(f)
+
+    resource_file = glob.glob(os.path.join(RESOURCE_FOLDER, '*'))
+    for f in resource_file:
+        os.remove(f)
     for url in urls['urls']:
         try:
             # delete all the files in the folder
-            upload_file = glob.glob(os.path.join(UPLOAD_FOLDER, '*'))
-            for f in upload_file:
-                os.remove(f)
-
-            resource_file = glob.glob(os.path.join(RESOURCE_FOLDER, '*'))
-            for f in resource_file:
-                os.remove(f)
 
             headers = {
                 'User-Agent': "Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.27 Safari/537.17"
