@@ -68,6 +68,7 @@ This project is a web application that allows users to upload PDF files or provi
 
 ## Functions
 ## Video
+[Link](https://github.com/user-attachments/assets/b15a1009-fd20-441e-a753-6650044a4596)
 ## Bugs and Assumptions
 
 ## to-do
