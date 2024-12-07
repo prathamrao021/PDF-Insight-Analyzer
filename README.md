@@ -186,7 +186,3 @@ This project is a web application that allows users to upload PDF files or provi
 - Valid URLs: It is assumed that the provided URLs are valid and point to accessible PDF files.
 - Data Quality: It is assumed that the data extracted from the PDF files is clean and suitable for clustering.
 - Environment Setup: It is assumed that the environment is set up correctly with all the necessary dependencies installed.
-
-## to-do
-- [ ] readme
-- [ ] video
