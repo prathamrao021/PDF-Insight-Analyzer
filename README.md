@@ -1,4 +1,4 @@
-# cis6930fa24-project3
+# PDF Insight Analyzer
 This project is a web application that allows users to upload PDF files or provide URLs to PDF files, processes the data, and visualizes the clustering results using various charts. The application is built using Next.js for the frontend and FastAPI for the backend.
 
 
